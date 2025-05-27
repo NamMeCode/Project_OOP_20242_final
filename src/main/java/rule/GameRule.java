@@ -41,9 +41,8 @@ import card.ListOfCards;
 import card.Card;
 
 public abstract class GameRule {
-    public boolean checkValidPlay(ListOfCards cardsOnHand, ListOfCards cardsOnTable) {
-        return true;
-    }
+    abstract public boolean checkValidPlay(ListOfCards cardsOnHand, ListOfCards cardsOnTable);
+
     public static boolean checkTwoCardsSameRank(ListOfCards cards) {
         if (cards.getSize() != 2) return false;
         return cards.getCardAt(0).getRank() == cards.getCardAt(1).getRank();

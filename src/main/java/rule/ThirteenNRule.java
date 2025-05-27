@@ -147,18 +147,11 @@ public class ThirteenNRule extends ThirteenRule {
                 if (checkSequence(cards)) {
                     return "Straight Flush";
                 }
-                // Thùng đơn thuần (5 lá cùng chất nhưng không liên tiếp)
-                if (checkFlush(cards)) {
-                    return "Flush";
-                }
                 break;
 
             default:
                 if (size >= 3 && checkSequence(cards)) {
                     return "Straight Flush";  // Luôn là straight flush vì phải cùng chất
-                }
-                if (size >= 5 && checkFlush(cards)) {
-                    return "Flush";
                 }
                 if (size >= 6 && size % 2 == 0 && checkDoubleSequence(cards)) {
                     return "Double Sequence";  // Đã check flush trong method
@@ -167,76 +160,5 @@ public class ThirteenNRule extends ThirteenRule {
         }
 
         return "Invalid";
-    }
-
-    @Override
-    public boolean checkWinCondition(ListOfCards cards) {
-        return cards.getSize() == 0;
-    }
-
-    // Override lại method checkValidPlay cho miền Bắc
-    @Override
-    public boolean checkValidPlay(ListOfCards playCards, ListOfCards tableCards) {
-        if (playCards.getSize() == 0) return false;
-
-        // First play của round
-        if (tableCards.getSize() == 0) {
-            playCards.sortRankSuit();
-            String type = handType(playCards);
-            System.out.println("First play - Hand type: " + type);
-            return !type.equals("Invalid");
-        }
-
-        // Check bomb plays
-        if (playCards.getSize() != tableCards.getSize()) {
-            return checkBombPlay(playCards, tableCards);
-        }
-
-        // Same size - kiểm tra miền Bắc
-        playCards.sortRankSuit();
-        tableCards.sortRankSuit();
-        String playType = handType(playCards);
-        String tableType = handType(tableCards);
-
-        System.out.println("Play type: " + playType + ", Table type: " + tableType);
-
-        if (!playType.equals(tableType)) return false;
-        if (playType.equals("Invalid")) return false;
-
-        // MIỀN BẮC: Kiểm tra cùng chất cho đơn và đôi
-        if (playType.equals("Single")) {
-            // Đánh đơn phải cùng chất với lá trên bàn
-            if (playCards.getCardAt(0).getSuit() != tableCards.getCardAt(0).getSuit()) {
-                return false;
-            }
-        } else if (playType.equals("Pair")) {
-            // MIỀN BẮC: Đánh đôi phải cùng màu với đôi trên bàn
-            if (!playCards.getCardAt(0).checkSameColour(tableCards.getCardAt(0)) ||
-                    !playCards.getCardAt(1).checkSameColour(tableCards.getCardAt(1))) {
-                return false;
-            }
-        }
-
-        // Compare highest cards
-        return playCards.getCardAt(playCards.getSize() - 1)
-                .compareCard(tableCards.getCardAt(tableCards.getSize() - 1)) > 0;
-    }
-
-    private boolean checkBombPlay(ListOfCards playCards, ListOfCards tableCards) {
-        playCards.sortRankSuit();
-
-        // Four of a kind can beat any single, pair, or triple
-        if (checkFourCardsSameRank(playCards)) {
-            return tableCards.getSize() <= 3;
-        }
-
-        // Double sequence can beat smaller combinations (miền Bắc cần cùng chất)
-        if (checkDoubleSequence(playCards)) {
-            if (tableCards.getSize() == 1 && playCards.getSize() >= 6) return true;
-            if (tableCards.getSize() == 2 && playCards.getSize() >= 8) return true;
-            if (tableCards.getSize() == 3 && playCards.getSize() >= 10) return true;
-        }
-
-        return false;
     }
 }

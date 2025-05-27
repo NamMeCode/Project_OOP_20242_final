@@ -47,13 +47,11 @@ public class ThirteenController implements Initializable {
 
     private Image cardBack;
     private int playerCount;
-    private final Map<ImageView, double[]> cardBasePosition = new HashMap<>();
     private final Map<Actor, List<ImageView>> playerCardViews = new HashMap<>();
     private final List<ImageView> selectedCards = new ArrayList<>();
     private final Map<ImageView, Boolean> cardSelectionState = new HashMap<>();
-    private ArrayList<Actor> players = new ArrayList<>();
-    private ArrayList<Actor> playersWinGame = new ArrayList<>();
-    private GameRule rule;
+    private final ArrayList<Actor> players = new ArrayList<>();
+    private final ArrayList<Actor> playersWinGame = new ArrayList<>();
     private final Map<Actor, Integer> playerOriginalIndex = new HashMap<>();
     private ThirteenRound currentRound;
     private Actor playerWinLastRound;
@@ -73,14 +71,8 @@ public class ThirteenController implements Initializable {
         this.playerCount = playerCount;
         this.playWithBots = playWithBots;
 
-        if (gameType.equals("ThirteenS")) {
-            rule = new ThirteenSRule();
-        } else {
-            rule = new ThirteenNRule();
-        }
-
         initializePlayers(playerCount, gameType);
-        playerWinLastRound = players.get(0);
+        playerWinLastRound = players.getFirst();
         cardBack = new Image(getClass().getResource("/com/example/project_oop_20242/cards/BACK.png").toExternalForm());
         createPlayerCardViews();
         animateDealFromLogic();
@@ -153,6 +145,29 @@ public class ThirteenController implements Initializable {
         timeline.play();
     }
 
+    private void dealCardToPlayer(ImageView card, StackPane targetPane, int playerIndex, int cardCount) {
+        card.setTranslateX(0);
+        card.setTranslateY(0);
+        if (!deckPane.getChildren().contains(card)) {
+            deckPane.getChildren().add(card);
+        }
+        TranslateTransition transition = new TranslateTransition(Duration.seconds(0.2), card);
+        double[] offsets = getPlayerOffset(playerIndex);
+        transition.setByX(offsets[0]);
+        transition.setByY(offsets[1]);
+        transition.setOnFinished(ev -> {
+            deckPane.getChildren().remove(card);
+            double[] position = calculateCardPosition(targetPane, cardCount);
+            if (playerIndex == 1) card.setRotate(90);
+            else if (playerIndex == 3) card.setRotate(-90);
+            card.setTranslateX(position[0]);
+            card.setTranslateY(position[1]);
+            targetPane.getChildren().add(card);
+            enableClickToggle(targetPane, card, position[0], position[1]);
+        });
+        transition.play();
+    }
+
     private void startNewRound() {
         currentRound = new ThirteenRound(players, playersWinGame, playerWinLastRound);
         clearSelection();
@@ -193,8 +208,7 @@ public class ThirteenController implements Initializable {
             Actor bot = currentRound.getCurrentPlayer();
             System.out.println("Bot is thinking...");
 
-            if (bot instanceof ThirteenBot) {
-                ThirteenBot thirteenBot = (ThirteenBot) bot;
+            if (bot instanceof ThirteenBot thirteenBot) {
 
                 // Bot tự động select cards
                 if (thirteenBot.autoSelectCards(currentRound.getCardsOnTable())) {
@@ -203,13 +217,13 @@ public class ThirteenController implements Initializable {
 
                     // Bot quyết định play
                     Timeline playDelay = new Timeline(new KeyFrame(Duration.seconds(1), ev -> {
-                        handleBotPlay();
+                        handlePlay();
                     }));
                     playDelay.play();
                 } else {
                     // Bot quyết định pass
                     Timeline passDelay = new Timeline(new KeyFrame(Duration.seconds(1), ev -> {
-                        handleBotPass();
+                        handlePass();
                     }));
                     passDelay.play();
                 }
@@ -253,46 +267,6 @@ public class ThirteenController implements Initializable {
         }
     }
 
-    private void handleBotPlay() {
-        Actor bot = currentRound.getCurrentPlayer();
-        System.out.println("Bot decided to play");
-
-        if (currentRound.play()) {
-            // Sử dụng chung animation với human player
-            animatePlayedCards();
-            Timeline delay = new Timeline(new KeyFrame(Duration.seconds(1.5), e -> {
-                if (playersWinGame.contains(bot)) {
-                    removeAllCardsFromWinner(bot);
-                }
-                if (!currentRound.isRoundActive()) {
-                    endRound();
-                } else {
-                    nextTurn();
-                }
-            }));
-            delay.play();
-        } else {
-            System.out.println("Bot play failed, passing instead");
-            handleBotPass();
-        }
-    }
-
-    private void handleBotPass() {
-        System.out.println("Bot decided to pass");
-        resetSelectedCardsToOriginalPosition();
-        currentRound.pass();
-        clearSelection();
-
-        Timeline delay = new Timeline(new KeyFrame(Duration.seconds(0.5), e -> {
-            if (!currentRound.isRoundActive()) {
-                endRound();
-            } else {
-                processCurrentTurn();
-            }
-        }));
-        delay.play();
-    }
-
     private void clearSelectionForPlayer(Actor player) {
         List<ImageView> playerCards = playerCardViews.get(player);
         if (playerCards != null) {
@@ -330,14 +304,14 @@ public class ThirteenController implements Initializable {
     }
 
     private void endGame() {
-        playersWinGame.add(players.get(0));
+        playersWinGame.add(players.getFirst());
         enablePlayerControls(false);
     }
 
     @FXML
     private void handlePlay() {
-        if (currentRound != null && currentRound.isCurrentPlayerHuman()) {
-            updatePlayerSelection();
+        if (currentRound != null) {
+            if(currentRound.isCurrentPlayerHuman()) updatePlayerSelection();
             Actor playingPlayer = currentRound.getCurrentPlayer();
             if (currentRound.play()) {
                 animatePlayedCards();
@@ -372,8 +346,8 @@ public class ThirteenController implements Initializable {
 
     @FXML
     private void handlePass() {
-        if (currentRound != null && currentRound.isCurrentPlayerHuman()) {
-            resetSelectedCardsToOriginalPosition();
+        if (currentRound != null) {
+            if(currentRound.isCurrentPlayerHuman()) resetSelectedCardsToOriginalPosition();
             currentRound.pass();
             clearSelection();
             Timeline delay = new Timeline(new KeyFrame(Duration.seconds(0.5), e -> {
@@ -530,29 +504,6 @@ public class ThirteenController implements Initializable {
             case 3 -> eastPane;
             default -> throw new IllegalStateException("Invalid player index: " + originalIndex);
         };
-    }
-
-    private void dealCardToPlayer(ImageView card, StackPane targetPane, int playerIndex, int cardCount) {
-        card.setTranslateX(0);
-        card.setTranslateY(0);
-        if (!deckPane.getChildren().contains(card)) {
-            deckPane.getChildren().add(card);
-        }
-        TranslateTransition transition = new TranslateTransition(Duration.seconds(0.2), card);
-        double[] offsets = getPlayerOffset(playerIndex);
-        transition.setByX(offsets[0]);
-        transition.setByY(offsets[1]);
-        transition.setOnFinished(ev -> {
-            deckPane.getChildren().remove(card);
-            double[] position = calculateCardPosition(targetPane, cardCount);
-            if (playerIndex == 1) card.setRotate(90);
-            else if (playerIndex == 3) card.setRotate(-90);
-            card.setTranslateX(position[0]);
-            card.setTranslateY(position[1]);
-            targetPane.getChildren().add(card);
-            enableClickToggle(targetPane, card, position[0], position[1]);
-        });
-        transition.play();
     }
 
     private double[] getPlayerOffset(int playerIndex) {

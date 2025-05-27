@@ -106,11 +106,11 @@ public class ChooseNumberOfPlayersController implements Initializable {
 
             switch (gameID) {
                 case 1 -> {
-                    fxmlPath = "Deck.fxml";
+                    fxmlPath = "ThirteenGame.fxml";
                     gameType = "ThirteenN";
                 }
                 case 2 -> {
-                    fxmlPath = "Deck.fxml";
+                    fxmlPath = "ThirteenGame.fxml";
                     gameType = "ThirteenS";
                 }
                 default -> throw new IllegalArgumentException("Invalid gameID: " + gameID);

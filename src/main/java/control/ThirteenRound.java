@@ -7,9 +7,9 @@ import player.ThirteenBot;
 import java.util.ArrayList;
 
 public class ThirteenRound {
-    private ArrayList<Actor> playersInRound = new ArrayList<>();
+    private final ArrayList<Actor> playersInRound = new ArrayList<>();
     private ArrayList<Actor> playersInGame;
-    private ArrayList<Actor> playersWinGame;
+    private final ArrayList<Actor> playersWinGame;
     private Actor playerLastInRound;
     private ListOfCards cardsOnTable = new ListOfCards();
     private int currentPlayerIndex;
@@ -45,10 +45,6 @@ public class ThirteenRound {
         return playerLastInRound;
     }
 
-    public ArrayList<Actor> getPlayersInRound() {
-        return playersInRound;
-    }
-
     // Chuyển sang lượt tiếp theo
     public void nextTurn() {
         if (playersInRound.size() <= 1) {
@@ -57,12 +53,8 @@ public class ThirteenRound {
             currentPlayer = null;
             return;
         }
-
-
         currentPlayerIndex = (currentPlayerIndex + 1) % playersInRound.size();
         currentPlayer = playersInRound.get(currentPlayerIndex);
-
-
     }
 
     // Xử lý lệnh Play - chung cho cả player và bot
@@ -82,11 +74,9 @@ public class ThirteenRound {
                 if (playersInRound.isEmpty()) {
                     currentPlayer = null;
                     roundActive = false;
-                } else {
+                } else if(currentPlayerIndex >= playersInRound.size()){
                     // Điều chỉnh index để nextTurn() chuyển đúng
-                    if (currentPlayerIndex >= playersInRound.size()) {
-                        currentPlayerIndex = playersInRound.size() - 1;
-                    }
+                    currentPlayerIndex = playersInRound.size() - 1;
                 }
             }
             return true;
@@ -97,16 +87,6 @@ public class ThirteenRound {
     // Xử lý lệnh Select
     public void select(int cardIndex) {
         currentPlayer.selectCard(cardIndex);
-    }
-
-    // Xử lý lệnh Unselect
-    public void unselect(int cardIndex) {
-        currentPlayer.unselectCard(cardIndex);
-    }
-
-    // Xử lý lệnh Sort
-    public void sort() {
-        currentPlayer.sortCardsOnHand();
     }
 
     // Xử lý lệnh Pass - chung cho cả player và bot
@@ -125,7 +105,6 @@ public class ThirteenRound {
         // Kiểm tra nếu chỉ còn 1 player hoặc không còn ai
         if (playersInRound.isEmpty()) {
             currentPlayer = null;
-
             roundActive = false;
             return;
         }
@@ -148,16 +127,6 @@ public class ThirteenRound {
         currentPlayer = playersInRound.get(currentPlayerIndex);
     }
 
-    // Bot tự động chọn bài (chỉ khác ở đây)
-    public boolean autoSelectCards() {
-        if (currentPlayer == null || !(currentPlayer instanceof ThirteenBot)) {
-            return false;
-        }
-
-        ThirteenBot bot = (ThirteenBot) currentPlayer;
-        return bot.autoSelectCards(cardsOnTable);
-    }
-
     // Kiểm tra xem player hiện tại có phải là bot không
     public boolean isCurrentPlayerBot() {
         return currentPlayer instanceof ThirteenBot;
@@ -166,38 +135,5 @@ public class ThirteenRound {
     // Kiểm tra xem player hiện tại có phải là human player không
     public boolean isCurrentPlayerHuman() {
         return currentPlayer instanceof ThirteenPlayer;
-    }
-
-    // Lấy thông tin về bài trên tay của player hiện tại
-    public String getCurrentPlayerHandString() {
-        return currentPlayer.toStringCardsOnHand();
-    }
-
-    // Lấy thông tin về bài đã chọn của player hiện tại
-    public String getCurrentPlayerSelectedString() {
-        return currentPlayer.toStringCardsSelected();
-    }
-
-    // Lấy ID của player hiện tại
-    public int getCurrentPlayerId() {
-        return currentPlayer.getId();
-    }
-
-    // Reset round cho game mới
-    public void reset(ArrayList<Actor> playersInGame, Actor playerStartRound) {
-        this.playersInGame = playersInGame;
-        cardsOnTable = new ListOfCards();
-        initializePlayersInRound(playersInGame);
-        currentPlayerIndex = playersInRound.indexOf(playerStartRound);
-        currentPlayer = playerStartRound;
-        roundActive = true;
-    }
-
-    // Lấy thông tin debug
-    public String getGameState() {
-        return String.format("Round Active: %b, Players in round: %d, Current player: %s, Cards on table: %s",
-                roundActive, playersInRound.size(),
-                currentPlayer != null ? currentPlayer.getId() : "null",
-                cardsOnTable.toString());
     }
 }

@@ -25,8 +25,7 @@ public class ListOfCards {
         return cardList;
     }
 
-    public String toString ()
-    {
+    public String toString () {
         StringBuilder sb = new StringBuilder();
         if (!cardList.isEmpty())
             sb.append("| ");

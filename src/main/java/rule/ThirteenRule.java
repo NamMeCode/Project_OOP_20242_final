@@ -1,48 +1,3 @@
-//package rule;
-//
-//import card.ListOfCards;
-//
-//abstract public class ThirteenRule extends GameRule {
-//    abstract public boolean checkDoubleSequence(ListOfCards cards);
-//
-//    abstract public boolean checkSequence(ListOfCards cards);
-//
-//    abstract public String handType(ListOfCards cards);
-//
-//    abstract public boolean checkWinCondition(ListOfCards cards);
-//
-//    public boolean checkValidPlay(ListOfCards playCards, ListOfCards tableCards) {
-//        if (playCards.getSize()==0)
-//            return false;
-//        if(tableCards.getSize() == 0) {
-//            playCards.sortRankSuit();
-//            return !handType(playCards).equals("Invalid");
-//        }
-//
-//        // check bombs
-//        if(playCards.getSize() != tableCards.getSize()) {
-//            if(tableCards.getCardAt(0).getRank() != 15) return false;
-//            if(tableCards.getSize() == 1) {
-//                if(checkFourCardsSameRank(playCards) || checkDoubleSequence(playCards)) return true;
-//            }
-//            else if(tableCards.getSize() == 2) {
-//                if(checkDoubleSequence(playCards) && playCards.getSize() >= 8) return true;
-//            }
-//            else if(tableCards.getSize() == 3) {
-//                if(checkDoubleSequence(playCards) && playCards.getSize() >= 10) return true;
-//            }
-//            else return false;
-//        }
-//
-//        playCards.sortRankSuit();
-//        tableCards.sortRankSuit();
-//        String typePlayCards = handType(playCards);
-//        String typeTableCards = handType(tableCards);
-//        if(!typePlayCards.equals(typeTableCards)) return false;
-//
-//        return playCards.getCardAt(playCards.getSize() - 1).compareCard(tableCards.getCardAt(tableCards.getSize() - 1)) > 0;
-//    }
-//}
 package rule;
 
 import card.ListOfCards;
@@ -51,7 +6,9 @@ abstract public class ThirteenRule extends GameRule {
     abstract public boolean checkDoubleSequence(ListOfCards cards);
     abstract public boolean checkSequence(ListOfCards cards);
     abstract public String handType(ListOfCards cards);
-    abstract public boolean checkWinCondition(ListOfCards cards);
+    public boolean checkWinCondition(ListOfCards cards) {
+        return cards.getSize() == 0;
+    }
 
     public boolean checkValidPlay(ListOfCards playCards, ListOfCards tableCards) {
         if (playCards.getSize() == 0) return false;
@@ -80,12 +37,12 @@ abstract public class ThirteenRule extends GameRule {
         if (!playType.equals(tableType)) return false;
         if (playType.equals("Invalid")) return false;
 
-        // Compare highest cards
+        // Compare the highest cards
         return playCards.getCardAt(playCards.getSize() - 1)
                 .compareCard(tableCards.getCardAt(tableCards.getSize() - 1)) > 0;
     }
 
-    private boolean checkBombPlay(ListOfCards playCards, ListOfCards tableCards) {
+    boolean checkBombPlay(ListOfCards playCards, ListOfCards tableCards) {
         playCards.sortRankSuit();
 
         // Four of a kind can beat any single, pair, or triple
@@ -94,10 +51,10 @@ abstract public class ThirteenRule extends GameRule {
         }
 
         // Double sequence can beat smaller combinations
-        if (checkDoubleSequence(playCards)) {
+        if (checkDoubleSequence(playCards) && tableCards.getCardAt(0).getRank() == 15) {
             if (tableCards.getSize() == 1 && playCards.getSize() >= 6) return true;
             if (tableCards.getSize() == 2 && playCards.getSize() >= 8) return true;
-            if (tableCards.getSize() == 3 && playCards.getSize() >= 10) return true;
+            return tableCards.getSize() == 3 && playCards.getSize() >= 10;
         }
 
         return false;
