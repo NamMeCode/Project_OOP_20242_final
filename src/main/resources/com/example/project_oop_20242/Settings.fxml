@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+
+<StackPane prefHeight="1024.0" prefWidth="1536.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.project_oop_20242.SettingsController">
+   <children>
+      <ImageView fitHeight="1024.0" fitWidth="1536.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@cards/MenuBackGround.png" />
+         </image>
+      </ImageView>
+        <VBox alignment="CENTER" prefHeight="310.0" prefWidth="355.0" spacing="100.0">
+         <Label fx:id="ChooseDisplayModeLabel" text="Choose Display Mode" textFill="#86910e">
+            <font>
+               <Font name="Engravers MT" size="50.0" />
+            </font>
+         </Label>
+         <Button fx:id="selectTextModeButton" focusTraversable="false" mnemonicParsing="false" onAction="#selectTextMode" onMouseEntered="#selectTextModeEnter" onMouseExited="#selectTextModeExit" prefHeight="44.0" prefWidth="219.0" style="-fx-background-radius: 8;" styleClass="Button" stylesheets="@MenuStyle.css" text="Chế độ văn bản (Text Mode)">
+            <font>
+               <Font name="Times New Roman Bold" size="15.0" />
+            </font>
+            <cursor>
+               <Cursor fx:constant="HAND" />
+            </cursor>
+         </Button>
+         <Button fx:id="selectGraphicModeButton" focusTraversable="false" mnemonicParsing="false" onAction="#selectGraphicMode" onMouseEntered="#selectGraphicModeEnter" onMouseExited="#selectGraphicModeExit" prefHeight="44.0" prefWidth="233.0" style="-fx-background-radius: 8;" styleClass="Button" stylesheets="@MenuStyle.css" text="Chế độ đồ họa (Graphic Mode)">
+            <font>
+               <Font name="Times New Roman Bold" size="15.0" />
+            </font>
+            <cursor>
+               <Cursor fx:constant="HAND" />
+            </cursor>
+         </Button>
+         <Button fx:id="backButton" focusTraversable="false" mnemonicParsing="false" onAction="#backToMenu" onMouseEntered="#backButtonEnter" onMouseExited="#backButtonExit" prefHeight="44.0" prefWidth="120.0" style="-fx-background-radius: 8;" styleClass="Button" stylesheets="@MenuStyle.css" text="Back">
+            <font>
+               <Font name="Times New Roman Bold" size="15.0" />
+            </font>
+            <cursor>
+               <Cursor fx:constant="HAND" />
+            </cursor>
+         </Button>
+        </VBox>
+   </children>
+</StackPane>
