@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="600.0" prefWidth="900.0" styleClass="bodybg" stylesheets="@BackgroundGame.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.project_oop_20242.ThirteenController">
+    <top>
+        <VBox spacing="10.0">
+            <children>
+                <StackPane fx:id="northPane" prefHeight="150.0" prefWidth="200.0" />
+            </children>
+        </VBox>
+    </top>
+    <left>
+        <StackPane fx:id="westPane" prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+    </left>
+    <center>
+        <VBox alignment="CENTER" spacing="10.0">
+            <children>
+                <StackPane fx:id="centerPane" prefHeight="100.0" prefWidth="300.0" />
+                <StackPane fx:id="deckPane" prefHeight="242.0" prefWidth="500.0" />
+            </children>
+        </VBox>
+    </center>
+    <right>
+        <StackPane fx:id="eastPane" prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+    </right>
+    <bottom>
+        <StackPane prefHeight="210.0" prefWidth="900.0" BorderPane.alignment="CENTER">
+            <children>
+                <VBox prefHeight="200.0" prefWidth="100.0" spacing="20.0">
+                    <children>
+                        <HBox alignment="CENTER" prefHeight="50.0" prefWidth="200.0" spacing="30.0">
+                            <children>
+                                <Button fx:id="playButton" mnemonicParsing="false" onAction="#handlePlay" text="Play" />
+                                <Button fx:id="passButton" mnemonicParsing="false" onAction="#handlePass" text="Pass" />
+                            </children>
+                        </HBox>
+                        <StackPane fx:id="southPane" prefHeight="150.0" prefWidth="900.0" />
+                    </children>
+                </VBox>
+            </children>
+        </StackPane>
+    </bottom>
+</BorderPane>
